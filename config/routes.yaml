@@ -1,0 +1,8 @@
+index:
+   path: /
+   controller: App\Infrastructure\Controller\IndexController
+
+
+login:
+   path: /login
+   controller: App\Infrastructure\Controller\LoginController
