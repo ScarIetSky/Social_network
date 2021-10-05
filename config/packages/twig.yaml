@@ -1,6 +1,6 @@
 twig:
     paths:
-        '%kernel.project_dir%/src/Infrastructure/Templates': __main__
+        '%kernel.project_dir%/src/Resources/Templates': __main__
 
 when@test:
     twig:
