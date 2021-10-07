@@ -11,7 +11,13 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
+    private int $age;
+
+    private array $friends = [];
+
     private string $id;
+
+    private string $interests;
 
     /**
      */
@@ -26,16 +32,41 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $roles = ['ROLE_USER'];
 
+    private string $sex;
+
     /**
-     * @param        $id
-     * @param        $login
+     * @param string $id
+     * @param string $login
      * @param string $password
+     * @param string $sex
+     * @param int    $age
+     * @param string $interests
      */
-    public function __construct($id, $login, string $password)
-    {
+    public function __construct(
+        string $id,
+        string $login,
+        string $password,
+        string $sex,
+        int $age,
+        string $interests
+    ) {
         $this->id = $id;
         $this->login = $login;
         $this->password = $password;
+        $this->sex = $sex;
+        $this->age = $age;
+        $this->interests = $interests;
+    }
+
+    public function addFriend(string $id): void
+    {
+        if ($id === $this->id) {
+            return;
+        }
+
+        if (!in_array($id, $this->friends, true)) {
+            $this->friends[] = $id;
+        }
     }
 
     /**
@@ -47,9 +78,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // $this->plainPassword = null;
     }
 
+    /**
+     * @return int
+     */
+    public function getAge(): int
+    {
+        return $this->age;
+    }
+
+    public function getFriends(): array
+    {
+        return $this->friends;
+    }
+
     public function getId(): string
     {
         return $this->id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getInterests(): string
+    {
+        return $this->interests;
     }
 
     public function getLogin(): ?string
@@ -108,13 +160,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
+     * @return string
+     */
+    public function getSex(): string
+    {
+        return $this->sex;
+    }
+
+    /**
      * A visual identifier that represents this user.
      *
      * @see UserInterface
      */
     public function getUserIdentifier(): string
     {
-        return (string) $this->login;
+        return $this->login;
     }
 
     public function getUsername()

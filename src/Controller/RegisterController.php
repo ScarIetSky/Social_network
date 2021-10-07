@@ -6,16 +6,16 @@ namespace App\Controller;
 
 use App\Domain\User\Factory\UserFactory;
 use App\Domain\User\Repository\UserRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  *
  */
 class RegisterController extends BaseController
 {
-    private UserRepository $userRepository;
     private UserFactory $userFactory;
+    private UserRepository $userRepository;
 
     /**
      * @param UserRepository $userRepository
@@ -28,21 +28,33 @@ class RegisterController extends BaseController
     }
 
 
-    public function __invoke(Request $httpRequest)
+    public function __invoke(Request $httpRequest): Response
     {
         if ($httpRequest->getMethod() === Request::METHOD_POST) {
             $this->registerUser($httpRequest);
+
+            return $this->redirectToRoute('login');
         }
 
         return $this->render('register.html.twig');
     }
 
-    private function registerUser(Request $httpRequest)
+    private function registerUser(Request $httpRequest): void
     {
         $login = $httpRequest->get('login');
         $password = $httpRequest->get('password');
+        $age = (int) $httpRequest->get('age');
+        $sex = $httpRequest->get('sex');
+        $interests = $httpRequest->get('interests');
 
-        $user = $this->userFactory->create($login, $password);
+        $user = $this->userFactory->create(
+            $login,
+            $password,
+            $sex,
+            $age,
+            $interests
+        );
+
         $this->userRepository->add($user);
     }
 }

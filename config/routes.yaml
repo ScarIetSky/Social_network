@@ -1,6 +1,18 @@
-index:
+home:
    path: /
    controller: App\Controller\IndexController
+
+usersView:
+   path: /user/{id}
+   controller: App\Controller\UsersViewController
+
+addFriend:
+   path: /add-friend/{usersId}
+   controller: App\Controller\AddFriendController
+
+people:
+   path: /people
+   controller: App\Controller\PeopleController
 
 login:
    path: /login

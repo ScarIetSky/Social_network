@@ -24,14 +24,22 @@ class UserFactory
         $this->userPasswordHasherInterface = $userPasswordHasherInterface;
     }
 
-    public function create(string $login, string $password): User
-    {
+    public function create(
+        string $login,
+        string $password,
+        string $sex,
+        int $age,
+        string $interests
+    ): User {
         $id = Uuid::uuid4()->toString();
 
         $user = new User(
             $id,
             $login,
-            $password
+            $password,
+            $sex,
+            $age,
+            $interests
         );
 
         $password = $this->userPasswordHasherInterface->hashPassword($user, $password);

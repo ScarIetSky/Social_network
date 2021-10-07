@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Domain\User\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Main page controller.
+ * Index controller.
  */
 class IndexController extends BaseController
 {
@@ -21,6 +22,11 @@ class IndexController extends BaseController
     {
         $user = $this->getCurrentUser();
 
-        return $this->render('index.html.twig', ['error' => null, 'userName' => $user->getLogin()]);
+        if ($user) {
+            $this->redirectToRoute('usersView', ['id' => $user->getId()]);
+        }
+
+
+        return $this->redirectToRoute('login');
     }
 }

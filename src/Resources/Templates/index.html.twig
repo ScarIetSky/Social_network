@@ -4,199 +4,181 @@
     <nav class="navbar navbar-inverse navbar-static-top">
         <div class="container">
             <div class="navbar-header">
-                <a class="navbar-brand" href="@{/}">
-                    <img src="{{ asset('/img/logo.png') }}" alt="memorynotfound logo" width="16px" height="16px"/>
+                <a class="navbar-brand" href="{{ path('usersView', {'id': userInfo.id}) }}">
+                    <img src="{{ asset('/img/logo.png') }}" alt="memorynotfound logo" width="16px"
+                            height="16px"/>
                 </a>
-                <a class="navbar-brand" href="@{/}">Home</a>
+                <a class="navbar-brand" href="{{ path('people')}}">People</a>
+                <a class="navbar-brand" href="{{ path('usersView', {'id': app.user.id}) }}">Profile</a>
             </div>
             <div id="navbar" class="collapse navbar-collapse">
                 <ul class="nav navbar-nav">
                     <li>
-                        <a href="@{/users}">Users</a>
-                    </li>
-                    <li authorize="isAuthenticated()">
-                        <a href="@{/logout}">Logout</a>
+                        <a href="{{ path('logout') }}">Logout</a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
     <div class="container">
-            <h1>Welcome, {{ userName }}!</h1>
-            <div class="form-row">
-                <div class="tab-content no-border padding-24">
-                    <div id="home" class="tab-pane in active">
-                        <div class="row">
-                            <div class="col-xs-12 col-sm-3 center">
+        <div class="form-row">
+            <div class="tab-content no-border padding-24">
+                <div id="home" class="tab-pane in active">
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-3 center">
 							<span class="profile-picture">
-								<img class="editable img-responsive" alt=" Avatar" id="avatar2" src="http://bootdey.com/img/Content/avatar/avatar3.png">
+								<img class="editable img-responsive" alt=" Avatar" id="avatar2"
+                                        {% if userInfo.sex == 'female' %}
+                                            src="http://bootdey.com/img/Content/avatar/avatar3.png">
+                                        {% else %}
+                                            src="http://bootdey.com/img/Content/avatar/avatar7.png">
+                                        {% endif %}
 							</span>
 
-                                <div class="space space-4"></div>
+                            <div class="space space-4"></div>
 
-                                <a href="#" class="btn btn-sm btn-block btn-success">
-                                    <i class="ace-icon fa fa-plus-circle bigger-120"></i>
-                                    <span class="bigger-110">Add as a friend</span>
-                                </a>
-
+                            {% if app.user.id != userInfo.id%}
+                                {% if not userInfo.friends[app.user.id] is defined %}
+                                    <a href="{{ path('addFriend', {'usersId': userInfo.id}) }}" class="btn btn-sm btn-block btn-success">
+                                        <i class="ace-icon fa fa-plus-circle bigger-120"></i>
+                                        <span class="bigger-110">Add as a friend</span>
+                                    </a>
+                                {% endif %}
                                 <a href="#" class="btn btn-sm btn-block btn-primary">
                                     <i class="ace-icon fa fa-envelope-o bigger-110"></i>
-                                    <span class="bigger-110">Send a message</span>
+                                    <span class="bigger-110"> Send a message</span>
                                 </a>
-                            </div><!-- /.col -->
+                            {% endif %}
 
-                            <div class="col-xs-12 col-sm-9">
-                                <h4 class="blue">
-                                    <span class="middle" utext="${appUser.firstName + ' ' + appUser.secondName}">..</span>
+                        </div>
 
-                                    <span class="label label-purple arrowed-in-right">
+                        <div class="col-xs-12 col-sm-9">
+                            <h4 class="blue">
+                                <span class="middle">..</span>
+
+                                <span class="label label-purple arrowed-in-right">
 									<i class="ace-icon fa fa-circle smaller-80 align-middle"></i>
 									online
 								</span>
-                                </h4>
+                            </h4>
 
-                                <div class="profile-user-info">
-                                    <div class="profile-info-row">
-                                        <div class="profile-info-name"> Username </div>
+                            <div class="profile-user-info">
+                                <div class="profile-info-row">
+                                    <div class="profile-info-name"> Username</div>
 
-                                        <div class="profile-info-value">
-                                            <span utext="${appUser.login}">..</span>
-                                        </div>
-                                    </div>
-
-                                    <div class="profile-info-row">
-                                        <div class="profile-info-name"> Location </div>
-
-                                        <div class="profile-info-value">
-                                            <i class="fa fa-map-marker light-orange bigger-110"></i>
-                                            <span>Russia</span>
-                                            <span utext="${appUser.city}">..</span>
-                                        </div>
-                                    </div>
-
-                                    <div class="profile-info-row">
-                                        <div class="profile-info-name"> Age </div>
-
-                                        <div class="profile-info-value">
-                                            <span utext="${appUser.age}">..</span>
-                                        </div>
-                                    </div>
-
-                                    <div class="profile-info-row">
-                                        <div class="profile-info-name"> Gender </div>
-
-                                        <div class="profile-info-value">
-                                            <span utext="${appUser.gender}">..</span>
-                                        </div>
-                                    </div>
-
-                                    <div class="profile-info-row">
-                                        <div class="profile-info-name"> Joined </div>
-
-                                        <div class="profile-info-value">
-                                            <span>2010/06/20</span>
-                                        </div>
-                                    </div>
-
-                                    <div class="profile-info-row">
-                                        <div class="profile-info-name"> Last Online </div>
-
-                                        <div class="profile-info-value">
-                                            <span>3 hours ago</span>
-                                        </div>
+                                    <div class="profile-info-value">
+                                        <span>{{ userInfo.login }}</span>
                                     </div>
                                 </div>
 
-                                <div class="hr hr-8 dotted"></div>
+                                <div class="profile-info-row">
+                                    <div class="profile-info-name">Age</div>
 
-                                <div class="profile-user-info">
-                                    <div class="profile-info-row">
-                                        <div class="profile-info-name"> Website </div>
+                                    <div class="profile-info-value">
+                                        <span>{{ userInfo.age }}</span>
+                                    </div>
+                                </div>
 
-                                        <div class="profile-info-value">
-                                            <a href="#" target="_blank">www.google.com</a>
-                                        </div>
+                                <div class="profile-info-row">
+                                    <div class="profile-info-name">Gender</div>
+
+                                    <div class="profile-info-value">
+                                        <span>{{ userInfo.sex }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="profile-info-row">
+                                    <div class="profile-info-name">Interests</div>
+
+                                    <div class="profile-info-value">
+                                        <span>{{ userInfo.interests }}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="hr hr-8 dotted"></div>
+
+                            <div class="profile-user-info">
+                                <div class="profile-info-row">
+                                    <div class="profile-info-name"> Website</div>
+
+                                    <div class="profile-info-value">
+                                        <a href="#" target="_blank">www.google.com</a>
+                                    </div>
+                                </div>
+
+                                <div class="profile-info-row">
+                                    <div class="profile-info-name">
+                                        <i class="middle ace-icon fa fa-facebook-square bigger-150 blue"></i>
                                     </div>
 
-                                    <div class="profile-info-row">
-                                        <div class="profile-info-name">
-                                            <i class="middle ace-icon fa fa-facebook-square bigger-150 blue"></i>
-                                        </div>
+                                    <div class="profile-info-value">
+                                        <a href="#">Find me on Facebook</a>
+                                    </div>
+                                </div>
 
-                                        <div class="profile-info-value">
-                                            <a href="#">Find me on Facebook</a>
-                                        </div>
+                                <div class="profile-info-row">
+                                    <div class="profile-info-name">
+                                        <i class="middle ace-icon fa fa-twitter-square bigger-150 light-blue"></i>
                                     </div>
 
-                                    <div class="profile-info-row">
-                                        <div class="profile-info-name">
-                                            <i class="middle ace-icon fa fa-twitter-square bigger-150 light-blue"></i>
-                                        </div>
-
-                                        <div class="profile-info-value">
-                                            <a href="#">Follow me on Twitter</a>
-                                        </div>
+                                    <div class="profile-info-value">
+                                        <a href="#">Follow me on Twitter</a>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="space-20"></div>
+                    <div class="space-20"></div>
 
-                        <div class="row">
-                            <div class="col-xs-12 col-sm-6">
-                                <div class="widget-box transparent">
-                                    <div class="widget-header widget-header-small">
-                                        <h4 class="widget-title smaller">
-                                            <i class="ace-icon fa fa-check-square-o bigger-110"></i>
-                                            Little About Me
-                                        </h4>
-                                    </div>
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-6">
+                            <div class="widget-box transparent">
+                                <div class="widget-header widget-header-small">
+                                    <h4 class="widget-title smaller">
+                                        <i class="ace-icon fa fa-check-square-o bigger-110"></i>
+                                        Little About Me
+                                    </h4>
+                                </div>
 
-                                    <div class="widget-body">
-                                        <div class="widget-main">
-                                            <p utext="${appUser.interests}">..</p>
-                                            <p>
-                                                Thanks for visiting my profile.
-                                            </p>
-                                        </div>
+                                <div class="widget-body">
+                                    <div class="widget-main">
+                                        <p>
+                                            Thanks for visiting my profile.
+                                        </p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <div class="col-md-6">
-                    <h2>Friends:</h2>
-                    <table class="table table-sm table-dark">
-                        <thead>
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Name</th>
-                            <th scope="col">Surname</th>
-                            <th scope="col">Sex</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr each ="friend : ${appUser.friends}">
-                            <td scope="row">
-                                <a href="@{/user/{userId}(userId=${friend.id})}" utext="${friend.login}">...</a>
-                            </td>
-                            <td>
-                                <a href="@{/user/{userId}(userId=${friend.id})}" utext="${friend.firstName}">...</a>
-                            </td>
-                            <td>
-                                <a href="@{/user/{userId}(userId=${friend.id})}" utext="${friend.secondName}">...</a>
-                            </td>
-                            <td>
-                                <a href="@{/user/{userId}(userId=${friend.id})}" utext="${friend.gender}">...</a>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
             </div>
 
+            <div class="col-md-6">
+                <h2>Friends:</h2>
+                <table class="table table-sm table-dark">
+                    <thead>
+                    <tr>
+                        <th scope="col">Login</th>
+                        <th scope="col">Sex</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for friendId, friendInfo in userInfo.friends %}
+                        <tr>
+                            <td>
+                                <a href="{{ path('usersView', {'id' : friendId}) }}">{{ friendInfo.login }}</a>
+                            </td>
+                            <td>
+                                <span>{{ friendInfo.sex }}</span>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
+
+    </div>
 {% endblock %}
