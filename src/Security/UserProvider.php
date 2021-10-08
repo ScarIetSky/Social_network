@@ -33,7 +33,16 @@ class UserProvider implements UserProviderInterface, PasswordUpgraderInterface
      */
     public function loadUserByIdentifier(string $identifier): UserInterface
     {
-        $user = $this->userRepository->findOne($identifier);
+        try {
+            $user = $this->userRepository->findOne($identifier);
+        } catch (\Throwable $e) {
+            throw new UserNotFoundException(
+                sprintf(
+                    'User "%s" is not found.',
+                    $identifier
+                )
+            );
+        }
 
         if ($user === null) {
             throw new UserNotFoundException(

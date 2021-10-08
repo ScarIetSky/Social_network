@@ -92,12 +92,6 @@ class DbalUserRepository implements UserRepository
 
     public function findOne(string $login): User
     {
-        // $query = $this->connection->prepare(
-        //     "SELECT * FROM user WHERE login = ':login';"
-        // );
-        //
-        // $query->bindValue('login', $login, ParameterType::STRING);
-
         $query = $this->connection->query(
             sprintf(
                 'SELECT * FROM user WHERE login = %s;',
