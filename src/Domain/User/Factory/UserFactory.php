@@ -26,6 +26,8 @@ class UserFactory
 
     public function create(
         string $login,
+        string $name,
+        string $surname,
         string $password,
         string $sex,
         int $age,
@@ -36,6 +38,8 @@ class UserFactory
         $user = new User(
             $id,
             $login,
+            $name,
+            $surname,
             $password,
             $sex,
             $age,

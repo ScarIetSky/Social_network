@@ -68,14 +68,35 @@ class DbalUserRepository implements UserRepository
         $this->connection->commit();
     }
 
-    public function findAll(): array
+    public function findAll(string $name = null, string $surname = null): array
     {
-        $query = $this->connection->query('SELECT * FROM user;');
+        $where = '';
+
+        if ($name) {
+            $where = "WHERE name LIKE '%$name%'";
+        }
+
+        if ($surname) {
+            $where = "WHERE surname LIKE '%$surname%'";
+        }
+
+        if ($name && $surname) {
+            $where = "WHERE name = '%$name%' AND surname = '%$surname%'";
+        }
+
+        $query = $this->connection->query(
+            sprintf(
+                'SELECT * FROM user %s LIMIT 100;',
+                $where
+            )
+        );
 
         foreach ($query->fetchAllAssociative() as $userData) {
             $user = new User(
                 $userData['id'],
                 $userData['login'],
+                $userData['name'],
+                $userData['surname'],
                 $userData['password'],
                 $userData['sex'],
                 (int) $userData['age'],
@@ -108,6 +129,8 @@ class DbalUserRepository implements UserRepository
         $user = new User(
             $result['id'],
             $result['login'],
+            $result['name'],
+            $result['surname'],
             $result['password'],
             $result['sex'],
             (int) $result['age'],
@@ -154,6 +177,8 @@ class DbalUserRepository implements UserRepository
         $user = new User(
             $result['id'],
             $result['login'],
+            $result['name'],
+            $result['surname'],
             $result['password'],
             $result['sex'],
             (int) $result['age'],

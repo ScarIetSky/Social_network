@@ -13,7 +13,7 @@ interface UserRepository
 {
     public function add(User $user): void;
 
-    public function findAll(): array;
+    public function findAll(string $name = null, string $surname = null): array;
 
     public function update(User $user): void;
 

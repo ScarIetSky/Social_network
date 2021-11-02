@@ -43,12 +43,16 @@ class RegisterController extends BaseController
     {
         $login = $httpRequest->get('login');
         $password = $httpRequest->get('password');
+        $name = $httpRequest->get('name');
+        $surname = $httpRequest->get('surname');
         $age = (int) $httpRequest->get('age');
         $sex = $httpRequest->get('sex');
         $interests = $httpRequest->get('interests');
 
         $user = $this->userFactory->create(
             $login,
+            $name,
+            $surname,
             $password,
             $sex,
             $age,

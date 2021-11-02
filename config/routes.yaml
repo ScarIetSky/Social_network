@@ -25,3 +25,8 @@ logout:
 register:
    path: /register
    controller: App\Controller\RegisterController
+
+search:
+   path: /search
+   controller: App\Controller\SearchController
+   methods: [ GET ]

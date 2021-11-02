@@ -13,6 +13,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     private int $age;
 
+    private string $name;
+
+    private string $surname;
+
     private array $friends = [];
 
     private string $id;
@@ -37,6 +41,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @param string $id
      * @param string $login
+     * @param string $name
+     * @param string $surname
      * @param string $password
      * @param string $sex
      * @param int    $age
@@ -45,13 +51,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __construct(
         string $id,
         string $login,
+        string $name,
+        string $surname,
         string $password,
         string $sex,
         int $age,
         string $interests
-    ) {
+    )
+    {
         $this->id = $id;
         $this->login = $login;
+        $this->name = $name;
+        $this->surname = $surname;
         $this->password = $password;
         $this->sex = $sex;
         $this->age = $age;
@@ -84,6 +95,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getAge(): int
     {
         return $this->age;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSurname(): string
+    {
+        return $this->surname;
     }
 
     public function getFriends(): array
