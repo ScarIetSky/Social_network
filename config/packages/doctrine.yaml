@@ -1,13 +1,32 @@
 doctrine:
     dbal:
-        url: '%env(resolve:DATABASE_URL)%'
-        server_version: '8.0'
-        charset: UTF8
+        default_connection: primary
+        connections:
+            primary:
+                url: '%env(resolve:DATABASE_URL)%'
+                server_version: '8.0'
+                charset: UTF8
+                replicas:
+                   slave1:
+                     host:        '%env(DATABASE_SLAVE_HOST)%'
+                     port:        '%env(DATABASE_SLAVE_PORT)%'
+                     user:        '%env(DATABASE_SLAVE_USER)%'
+                     password:    '%env(DATABASE_SLAVE_PASSWORD)%'
+                     dbname:      '%env(DATABASE_SLAVE_DBNAME)%'
+                     charset:     UTF8
+            replica:
+                host:        '%env(DATABASE_SLAVE_HOST)%'
+                port:        '%env(DATABASE_SLAVE_PORT)%'
+                user:        '%env(DATABASE_SLAVE_USER)%'
+                password:    '%env(DATABASE_SLAVE_PASSWORD)%'
+                dbname:      '%env(DATABASE_SLAVE_DBNAME)%'
+                charset:     UTF8
+
     orm:
         default_entity_manager: default
         auto_generate_proxy_classes: true
         entity_managers:
           default:
-            connection: default
+            connection: primary
             auto_mapping: true
             naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware

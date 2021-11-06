@@ -7,34 +7,41 @@ namespace App\Persistency\Repository;
 use App\Domain\User\Entity\User;
 use App\Domain\User\Factory\UserFactory;
 use App\Domain\User\Repository\UserRepository;
-use Doctrine\DBAL\Driver\Connection;
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  *
  */
 class DbalUserRepository implements UserRepository
 {
-    private Connection $connection;
+    private ManagerRegistry $managerRegistry;
+
+    private Connection $masterConnection;
+    private Connection $slaveConnection;
 
     private UserFactory $userFactory;
 
     /**
-     * @param Connection $connection
+     * @param ManagerRegistry $managerRegistry
      */
-    public function __construct(Connection $connection, UserFactory $userFactory)
+    public function __construct(ManagerRegistry $managerRegistry, UserFactory $userFactory)
     {
-        $this->connection = $connection;
+        $this->masterConnection = $managerRegistry->getConnection('primary');
+        $this->slaveConnection = $managerRegistry->getConnection('replica');
+        $this->managerRegistry = $managerRegistry;
         $this->userFactory = $userFactory;
     }
 
 
     public function add(User $user): void
     {
-        $this->connection->beginTransaction();
-        $query = $this->connection->prepare(
-            "INSERT INTO user (id, login, password, roles, sex, age, interests) " .
-            "VALUES (:id, :login, :password, :roles, :sex, :age, :interests);"
+        $this->masterConnection->beginTransaction();
+
+        $query = $this->masterConnection->prepare(
+            "INSERT INTO user (id, login, password, roles, sex, age, interests, name, surname) " .
+            "VALUES (:id, :login, :password, :roles, :sex, :age, :interests, :name, :surname);"
         );
         $query->bindValue('id', $user->getId());
         $query->bindValue('login', $user->getLogin());
@@ -42,6 +49,8 @@ class DbalUserRepository implements UserRepository
         $query->bindValue('roles', json_encode($user->getRoles()));
         $query->bindValue('sex', $user->getSex());
         $query->bindValue('age', $user->getAge());
+        $query->bindValue('name', $user->getName());
+        $query->bindValue('surname', $user->getSurname());
         $query->bindValue('interests', $user->getInterests());
 
         $query->execute();
@@ -55,7 +64,7 @@ class DbalUserRepository implements UserRepository
 
         if ($friendsData !== '') {
 
-            $query = $this->connection->query(
+            $query = $this->masterConnection->query(
                 sprintf(
                     'INSERT IGNORE INTO users_friends (users_id, friends_id) VALUES %s;',
                     rtrim($friendsData, ',')
@@ -65,7 +74,7 @@ class DbalUserRepository implements UserRepository
             $query->execute();
         }
 
-        $this->connection->commit();
+        $this->masterConnection->commit();
     }
 
     public function findAll(string $name = null, string $surname = null): array
@@ -73,18 +82,18 @@ class DbalUserRepository implements UserRepository
         $where = '';
 
         if ($name) {
-            $where = "WHERE name LIKE '%$name%'";
+            $where = "WHERE name LIKE '$name'";
         }
 
         if ($surname) {
-            $where = "WHERE surname LIKE '%$surname%'";
+            $where = "WHERE surname LIKE '$surname'";
         }
 
         if ($name && $surname) {
-            $where = "WHERE name = '%$name%' AND surname = '%$surname%'";
+            $where = "WHERE name = '$name' AND surname = '$surname'";
         }
 
-        $query = $this->connection->query(
+        $query = $this->slaveConnection->query(
             sprintf(
                 'SELECT * FROM user %s LIMIT 100;',
                 $where
@@ -113,10 +122,10 @@ class DbalUserRepository implements UserRepository
 
     public function findOne(string $login): User
     {
-        $query = $this->connection->query(
+        $query = $this->slaveConnection->query(
             sprintf(
                 'SELECT * FROM user WHERE login = %s;',
-                $this->connection->quote($login, ParameterType::STRING)
+                $this->slaveConnection->quote($login, ParameterType::STRING)
             )
         );
 
@@ -139,7 +148,7 @@ class DbalUserRepository implements UserRepository
 
         $user->setRoles(json_decode($result['roles'], true));
 
-        $query = $this->connection->query(
+        $query = $this->slaveConnection->query(
             sprintf(
                 'SELECT * FROM users_friends WHERE users_id = "%s";',
                 $user->getId()
@@ -161,10 +170,10 @@ class DbalUserRepository implements UserRepository
 
     public function findOneById(string $id): User
     {
-        $query = $this->connection->query(
+        $query = $this->slaveConnection->query(
             sprintf(
                 'SELECT * FROM user WHERE id = %s;',
-                $this->connection->quote($id, ParameterType::STRING)
+                $this->slaveConnection->quote($id, ParameterType::STRING)
             )
         );
 
@@ -187,7 +196,7 @@ class DbalUserRepository implements UserRepository
 
         $user->setRoles(json_decode($result['roles'], true));
 
-        $query = $this->connection->query(
+        $query = $this->slaveConnection->query(
             sprintf(
                 'SELECT * FROM users_friends WHERE users_id = "%s";',
                 $user->getId()
@@ -209,17 +218,19 @@ class DbalUserRepository implements UserRepository
 
     public function update(User $user): void
     {
-        $this->connection->beginTransaction();
+        $this->masterConnection->beginTransaction();
 
-        $query = $this->connection->prepare(
+        $query = $this->masterConnection->prepare(
             "UPDATE user SET login = :login, password = :password, roles = :roles," .
-            " sex = :sex, age = :age, interests = :interests " .
+            " sex = :sex, age = :age, interests = :interests, name = :name, surname = :surname;" .
             "WHERE id = :id;"
         );
 
         $query->bindValue('login', $user->getLogin());
         $query->bindValue('password', $user->getPassword());
         $query->bindValue('roles', json_encode($user->getRoles()));
+        $query->bindValue('name', $user->getName());
+        $query->bindValue('surname', $user->getSurname());
         $query->bindValue('sex', $user->getSex());
         $query->bindValue('age', $user->getAge());
         $query->bindValue('interests', $user->getInterests());
@@ -234,7 +245,7 @@ class DbalUserRepository implements UserRepository
         }
 
         if ($friendsData !== '') {
-            $query = $this->connection->query(
+            $query = $this->masterConnection->query(
                 sprintf(
                     'INSERT IGNORE INTO users_friends (users_id, friends_id) VALUES %s;',
                     rtrim($friendsData, ',')
@@ -244,6 +255,6 @@ class DbalUserRepository implements UserRepository
             $query->execute();
         }
 
-        $this->connection->commit();
+        $this->masterConnection->commit();
     }
 }

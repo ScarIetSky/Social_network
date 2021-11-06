@@ -25,7 +25,11 @@ class SearchController extends BaseController
     }
 
 
-    // ./wrk -t12 -c100 -d10s http://127.0.0.1:8000/search?user=emma
+    // /mnt/c/Users/User/PhpstormProjects/Social_network/wrk
+    // ./wrk -t1 -c1 -d5s http://127.0.0.1:8000/search?user=emma
+    // ./wrk -t10 -c10 -d30s http://127.0.0.1:8000/search?user=emma
+    // ./wrk -t20 -c100 -d30s http://127.0.0.1:8000/search?user=emma
+    // ./wrk -t5 -c1000 -d30s http://127.0.0.1:8000/search?user=emma
     public function __invoke(Request $httpRequest): Response
     {
         $searchQuery = $httpRequest->getQueryString();
